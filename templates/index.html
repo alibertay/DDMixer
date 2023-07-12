@@ -3,8 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <title>DDMixer</title>
+    <style>
+        body {
+            background-color: #07303d;
+        }
+
+        #mixerDiv {
+            width: 30%;
+            height: 98%;
+            position: absolute;
+            top: 50%;
+            left: 30%;
+            transform: translate(-50%, -50%);
+            padding: 10px;
+            background-color: #f6b703;
+        }
+
+        #imageD {
+            position: absolute;
+            margin-top: 5%;
+            margin-left: 40%;
+            width: 22%;
+            height: 40%;
+            border-radius: 10px;
+        }
+
+        #buttonD {
+            position: absolute;
+            color: white;
+            background-color: #07303d;
+            border-color: #f6b703;
+            border-radius: 10px;
+            width: 45%;
+            margin-top: 40%;
+            margin-left: 25%;
+            height: 35px;
+        }
+
+        #buttonF {
+              width: 100px;
+              height: 100px;
+              border-radius: 50%;
+              background-color: #07303d;
+              border: none;
+              outline: none;
+              cursor: pointer;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+
+              margin-left: 40%;
+              margin-top: 67%;
+        }
+
+        #buttonF::before {
+          content: "";
+          position: absolute;
+          width: 100%;
+          height: 2px;
+          background-color: #ffffff;
+          bottom: 23%;
+          transform: translateY(50%);
+          margin-left: 3%;
+        }
+
+        .button-text {
+          font-size: 250%;
+          color: #FFFFFF;
+        }
+
+        #inputAreaDiv {
+            padding-left: 25%;
+            padding-top: 50%;
+        }
+
+        input{
+            border: 2px solid #f6b703;
+            background-color: #07303d;
+            color: white;
+            border-radius: 10px;
+            padding: 5px;
+            height: 20px;
+            width: 60%;
+        }
+
+    </style>
 </head>
 <body>
+    <div id="mixerDiv">
+        <div id="transactDiv">
+
+            <div id="inputAreaDiv">
+            <input type="text" id="input1" placeholder="To Wallet"><br/>
+              <input type="text" id="input2" style="margin-top: 15%;" placeholder="Ethereum Amount">
+                </div>
+
+              <button id="buttonD">Deposit</button>
+        </div>
+
+
+        <button id="buttonF">
+        <span class="button-text">W</span>
+    </button>
+    </div>
+
+    <img id="imageD" src="{{url_for('static', filename='image.jpg')}}"/>
 
 </body>
 </html>
