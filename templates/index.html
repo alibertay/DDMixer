@@ -40,6 +40,18 @@
             height: 35px;
         }
 
+        #buttonW {
+            position: absolute;
+            color: white;
+            background-color: #07303d;
+            border-color: #f6b703;
+            border-radius: 10px;
+            width: 45%;
+            margin-top: 40%;
+            margin-left: 25%;
+            height: 35px;
+        }
+
         #buttonF {
               width: 100px;
               height: 100px;
@@ -102,12 +114,65 @@
         </div>
 
 
-        <button id="buttonF">
-        <span class="button-text">W</span>
+        <button id="buttonF" onclick="switchToWithdraw()">
+        <span class="button-text" id="buttonFText">W</span>
     </button>
     </div>
 
     <img id="imageD" src="{{url_for('static', filename='image.jpg')}}"/>
+
+<script>
+    function switchToWithdraw() {
+        // input1'in kaldırılması
+        var input1 = document.getElementById("input1");
+        input1.parentNode.removeChild(input1);
+
+        // input2'nin placeholder'ının değiştirilmesi
+        document.getElementById("input2").placeholder = "Hash Pass";
+
+        // buttonD'nin idsinin değiştirilmesi
+        document.getElementById("buttonD").id = "buttonW";
+
+        // buttonW'nin textinin değiştirilmesi
+        document.getElementById("buttonW").textContent = "Withdraw";
+
+        document.getElementById("buttonFText").textContent = "D";
+
+        document.getElementById("buttonF").onclick = switchToDeposit
+    }
+
+    function switchToDeposit() {
+
+        getBack();
+
+        document.getElementById("buttonFText").textContent = "W";
+
+        document.getElementById("buttonF").onclick = switchToWithdraw
+    }
+
+    function getBack() {
+        // input1'in yeniden eklenmesi
+        var inputAreaDiv = document.getElementById("inputAreaDiv");
+        var input1 = document.createElement("input");
+        input1.type = "text";
+        input1.id = "input1";
+        input1.placeholder = "To Wallet";
+        inputAreaDiv.appendChild(input1);
+
+        // input2'nin placeholder'ının eski haline getirilmesi
+        document.getElementById("input2").placeholder = "Ether Amount";
+
+        // buttonW'nin idsinin değiştirilmesi
+        document.getElementById("buttonW").id = "buttonD";
+
+        // buttonD'nin textinin değiştirilmesi
+        document.getElementById("buttonD").textContent = "Deposit";
+    }
+</script>
+
+
+
+
 
 </body>
 </html>
