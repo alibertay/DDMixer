@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>DD Mixer</title>
     <style>
         body {
@@ -20,7 +22,7 @@
         }
 
         #imageD {
-            position: absolute;
+            position: relative;
             margin-top: 5%;
             margin-left: 40%;
             width: 22%;
@@ -29,25 +31,25 @@
         }
 
         #buttonD {
-            position: absolute;
+            position: relative;
             color: white;
             background-color: #07303d;
             border-color: #f6b703;
             border-radius: 10px;
             width: 45%;
-            margin-top: 40%;
+            margin-top: 30%;
             margin-left: 25%;
             height: 35px;
         }
 
         #buttonW {
-            position: absolute;
+            position: relative;
             color: white;
             background-color: #07303d;
             border-color: #f6b703;
             border-radius: 10px;
             width: 45%;
-            margin-top: 40%;
+            margin-top: 30%;
             margin-left: 25%;
             height: 35px;
         }
@@ -65,18 +67,12 @@
               align-items: center;
 
               margin-left: 40%;
-              margin-top: 67%;
+              margin-top: 20%;
         }
 
-        #buttonF::before {
-          content: "";
-          position: absolute;
-          width: 100%;
-          height: 2px;
-          background-color: #ffffff;
-          bottom: 23%;
-          transform: translateY(50%);
-          margin-left: 3%;
+        #transactDiv {
+            border-bottom: 2px solid white;
+            height: 70%;
         }
 
         .button-text {
@@ -86,7 +82,7 @@
 
         #inputAreaDiv {
             padding-left: 25%;
-            padding-top: 50%;
+            padding-top: 35%;
         }
 
         input{
@@ -99,6 +95,21 @@
             width: 60%;
         }
 
+        #storyP{
+            color: white;
+            margin-left: 70%;
+            margin-right: 10%;
+            position: relative;
+        }
+
+        h1 {
+            color: white;
+            margin-left: 70%;
+            margin-right: 10%;
+            margin-top: -15%;
+            position: relative;
+        }
+
     </style>
 </head>
 <body>
@@ -107,10 +118,10 @@
 
             <div id="inputAreaDiv">
             <input type="text" id="input1" placeholder="To Wallet"><br/>
-              <input type="text" id="input2" style="margin-top: 15%;" placeholder="Ether Amount">
+              <input type="text" id="input2" placeholder="Ether Amount">
                 </div>
 
-              <button id="buttonD">Deposit</button>
+              <button id="buttonD" onclick="deposit()">Deposit</button>
         </div>
 
 
@@ -120,6 +131,17 @@
     </div>
 
     <img id="imageD" src="{{url_for('static', filename='image.jpg')}}"/>
+
+    <div>
+        <h1>Lorem Ipsum</h1>
+        <p id="storyP">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.<br/><br/>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.<br/><br/>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.<br/><br/>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+        </p>
+    </div>
 
 <script>
     function switchToWithdraw() {
@@ -135,6 +157,7 @@
 
         // buttonW'nin textinin değiştirilmesi
         document.getElementById("buttonW").textContent = "Withdraw";
+        document.getElementById("buttonW").onclick = withdraw
 
         document.getElementById("buttonFText").textContent = "D";
 
@@ -164,9 +187,18 @@
 
         // buttonW'nin idsinin değiştirilmesi
         document.getElementById("buttonW").id = "buttonD";
+        document.getElementById("buttonD").onclick = deposit
 
         // buttonD'nin textinin değiştirilmesi
         document.getElementById("buttonD").textContent = "Deposit";
+    }
+
+    function withdraw() {
+        alert("Withdraw called");
+    }
+
+    function deposit() {
+        alert("Deposit called");
     }
 </script>
 
