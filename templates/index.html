@@ -108,8 +108,19 @@
             color: white;
             margin-left: 70%;
             margin-right: 10%;
-            margin-top: -18%;
+            margin-top: -20%;
             position: relative;
+        }
+
+        #connectButton {
+            position: relative;
+            margin-left: 83%;
+            font-size: 125%;
+            color: white;
+            border: 2px solid #f6b703;
+            background-color: #07303d;
+            width:15%;
+            border-radius: 10px;
         }
 
     </style>
@@ -120,7 +131,7 @@
 
             <div id="inputAreaDiv">
             <input type="text" id="input1" placeholder="To Wallet"><br/>
-              <input type="text" id="input2" placeholder="Ether Amount">
+              <input type="text" id="input2" placeholder="BNB Amount">
                 </div>
 
               <button id="buttonD" onclick="deposit()">Deposit</button>
@@ -131,6 +142,8 @@
         <span class="button-text" id="buttonFText">W</span>
     </button>
     </div>
+
+    <button id="connectButton" onclick="connectWallet()">Connect Wallet</button>
 
     <img id="imageD" src="{{url_for('static', filename='image.jpg')}}"/>
 
@@ -193,6 +206,57 @@
         document.getElementById("buttonD").textContent = "Deposit";
     }
 
+    function connectWallet() {
+        alert("Connect wallet called");
+
+        if (typeof window.ethereum !== 'undefined') {
+    // Metamask bağlantısını burada gerçekleştirin
+    ethereum.request({ method: 'eth_requestAccounts' })
+      .then(function(accounts) {
+        // Metamask bağlantısı başarılı olduğunda yapılacak işlemler
+        console.log('Metamask bağlantısı başarılı');
+        console.log('Bağlı hesap:', accounts[0]);
+
+        // Bağlantıyı BSC ağına değiştirin
+        ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [
+            {
+              chainId: '0x38', // BSC ağının chainId'si
+              chainName: 'Binance Smart Chain',
+              nativeCurrency: {
+                name: 'BNB',
+                symbol: 'BNB',
+                decimals: 18
+              },
+              rpcUrls: ['https://data-seed-prebsc-1-s1.binance.org:8545/'], // https://bsc-dataseed.binance.org/
+              blockExplorerUrls: ['https://testnet.bscscan.com'] // https://bscscan.com/
+            }
+          ]
+        })
+          .then(function(result) {
+            // BSC ağına geçiş başarılı olduğunda yapılacak işlemler
+            var connectButton = document.getElementById("connectButton");
+            connectButton.style.display = 'none';
+            console.log('BSC ağına geçiş başarılı');
+
+            // Buraya eklemek istediğiniz işlemleri yapabilirsiniz
+          })
+          .catch(function(error) {
+            // BSC ağına geçiş başarısız olduğunda yapılacak işlemler
+            console.error('BSC ağına geçiş başarısız:', error);
+          });
+      })
+      .catch(function(error) {
+        // Metamask bağlantısı başarısız olduğunda yapılacak işlemler
+        console.error('Metamask bağlantısı başarısız:', error);
+      });
+  } else {
+    // Metamask bulunamadığında
+    console.error('Metamask bulunamadı');
+  }
+    }
+
     function withdraw() {
         alert("Withdraw called");
     }
@@ -200,11 +264,14 @@
     function deposit() {
         alert("Deposit called");
     }
+
+    window.onload = function() {
+  if (typeof window.ethereum !== 'undefined') {
+    // Metamask bağlantısı varsa
+    var hideButton = document.getElementById('connectButton');
+    hideButton.style.display = 'none';
+  }
+};
 </script>
-
-
-
-
-
 </body>
 </html>
