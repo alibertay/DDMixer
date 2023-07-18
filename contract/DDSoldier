@@ -19,5 +19,9 @@ contract DDSoldier {
         payable(_toWallet).transfer(_value);
     }
 
+    function soldierBalance() public view returns(uint256) {
+        return address(this).balance;
+    }
+
     receive() external payable {}
 }
