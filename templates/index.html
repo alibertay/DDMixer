@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>DD Mixer</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <style>
         body {
             background-color: #07303d;
@@ -67,7 +68,27 @@
               align-items: center;
 
               margin-left: 40%;
-              margin-top: 20%;
+              margin-top: 5%;
+        }
+
+        #buttonP {
+            color: white;
+            background-color: #07303d;
+            border-color: #f6b703;
+            border-radius: 10px;
+            width: 45%;
+        }
+
+        #buttonH {
+            color: white;
+            background-color: #07303d;
+            border-color: #f6b703;
+            border-radius: 10px;
+            width: 45%;
+
+            position: relative;
+            margin-top: 5%;
+            margin-left: 27%;
         }
 
         #transactDiv {
@@ -123,6 +144,29 @@
             border-radius: 10px;
         }
 
+        #popup {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+        }
+
+        .popup-content {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
     </style>
 </head>
 <body>
@@ -130,8 +174,7 @@
         <div id="transactDiv">
 
             <div id="inputAreaDiv">
-            <input type="text" id="input1" placeholder="To Wallet"><br/>
-              <input type="text" id="input2" placeholder="BNB Amount">
+            <input type="text" id="input1" placeholder="To Wallet Hash">
                 </div>
 
               <button id="buttonD" onclick="deposit()">Deposit</button>
@@ -140,6 +183,8 @@
 
         <button id="buttonF" onclick="switchToWithdraw()">
         <span class="button-text" id="buttonFText">W</span>
+
+        <button onclick="popup()" id="buttonH">Hash Target Wallet</button>
     </button>
     </div>
 
@@ -156,19 +201,25 @@
         </p>
     </div>
 
+    <div id="popup">
+        <div class="popup-content">
+            <h2>Hash Target Wallet</h2>
+            <form id="popupForm">
+                <input type="text" name="name" placeholder="Target Wallet Address" required style="width: 100%;">
+                <br><br>
+                <button type="submit" id="buttonP">Hash</button>
+            </form><br/>
+            <button onclick="closePopup()" id="buttonP">Close</button>
+        </div>
+    </div>
+
 <script>
     function switchToWithdraw() {
-        // input1'in kaldırılması
-        var input1 = document.getElementById("input1");
-        input1.parentNode.removeChild(input1);
 
-        // input2'nin placeholder'ının değiştirilmesi
-        document.getElementById("input2").placeholder = "Hash Pass";
+        document.getElementById("input1").placeholder = "Hash Pass";
 
-        // buttonD'nin idsinin değiştirilmesi
         document.getElementById("buttonD").id = "buttonW";
 
-        // buttonW'nin textinin değiştirilmesi
         document.getElementById("buttonW").textContent = "Withdraw";
         document.getElementById("buttonW").onclick = withdraw
 
@@ -187,22 +238,11 @@
     }
 
     function getBack() {
-        // input1'in yeniden eklenmesi
-        var inputAreaDiv = document.getElementById("inputAreaDiv");
-        var input1 = document.createElement("input");
-        input1.type = "text";
-        input1.id = "input1";
-        input1.placeholder = "To Wallet";
-        inputAreaDiv.appendChild(input1);
+        document.getElementById("input1").placeholder = "To Wallet Hash"
 
-        // input2'nin placeholder'ının eski haline getirilmesi
-        document.getElementById("input2").placeholder = "Ether Amount";
-
-        // buttonW'nin idsinin değiştirilmesi
         document.getElementById("buttonW").id = "buttonD";
         document.getElementById("buttonD").onclick = deposit
 
-        // buttonD'nin textinin değiştirilmesi
         document.getElementById("buttonD").textContent = "Deposit";
     }
 
@@ -210,19 +250,16 @@
         alert("Connect wallet called");
 
         if (typeof window.ethereum !== 'undefined') {
-    // Metamask bağlantısını burada gerçekleştirin
     ethereum.request({ method: 'eth_requestAccounts' })
       .then(function(accounts) {
-        // Metamask bağlantısı başarılı olduğunda yapılacak işlemler
-        console.log('Metamask bağlantısı başarılı');
-        console.log('Bağlı hesap:', accounts[0]);
+        console.log('Metamask connection success');
+        console.log('Connected account:', accounts[0]);
 
-        // Bağlantıyı BSC ağına değiştirin
         ethereum.request({
           method: 'wallet_addEthereumChain',
           params: [
             {
-              chainId: '0x38', // BSC ağının chainId'si
+              chainId: '0x38',
               chainName: 'Binance Smart Chain',
               nativeCurrency: {
                 name: 'BNB',
@@ -235,25 +272,20 @@
           ]
         })
           .then(function(result) {
-            // BSC ağına geçiş başarılı olduğunda yapılacak işlemler
             var connectButton = document.getElementById("connectButton");
             connectButton.style.display = 'none';
-            console.log('BSC ağına geçiş başarılı');
+            console.log('BSC switch success');
 
-            // Buraya eklemek istediğiniz işlemleri yapabilirsiniz
           })
           .catch(function(error) {
-            // BSC ağına geçiş başarısız olduğunda yapılacak işlemler
-            console.error('BSC ağına geçiş başarısız:', error);
+            console.error('BSC switch error:', error);
           });
       })
       .catch(function(error) {
-        // Metamask bağlantısı başarısız olduğunda yapılacak işlemler
-        console.error('Metamask bağlantısı başarısız:', error);
+        console.error('Metamask connection failed:', error);
       });
   } else {
-    // Metamask bulunamadığında
-    console.error('Metamask bulunamadı');
+    console.error('Metamask cant find');
   }
     }
 
@@ -267,11 +299,45 @@
 
     window.onload = function() {
   if (typeof window.ethereum !== 'undefined') {
-    // Metamask bağlantısı varsa
     var hideButton = document.getElementById('connectButton');
     hideButton.style.display = 'none';
   }
 };
+
+function popup() {
+            $('#popup').fadeIn();
+        }
+
+function closePopup() {
+            $('#popup').fadeOut();
+        }
+
+        $(document).ready(function(){
+            $('#popupForm').submit(function(e){
+                e.preventDefault();
+                $.ajax({
+                    type: "POST",
+                    url: "/popup",
+                    data: $('#popupForm').serialize(),
+                    success: function(response){
+                        $('#popup').fadeOut();
+                        showAlert(response.name);
+                    }
+                });
+            });
+
+function showAlert(name) {
+                $.ajax({
+                    type: "POST",
+                    url: "/get_message",
+                    data: {name: name},
+                    success: function(response){
+                        alert(response.message);
+                    }
+                });
+            }
+        });
+
 </script>
 </body>
 </html>
