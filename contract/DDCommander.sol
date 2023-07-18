@@ -4,6 +4,11 @@ pragma solidity ^0.8.0;
 
 import "contracts/DDSoldier.sol";
 
+interface Soldier {
+    function withdrawOrder(address _toWallet, uint256 _value) external;
+    function soldierBalance() external view returns(uint256);
+}
+
 contract DDCommander {
     uint256 QueIndex;
     uint256 QueLimit;
@@ -14,7 +19,20 @@ contract DDCommander {
 
     mapping(bytes32 => address[]) Army;
 
-    function deposit() public payable {
+    struct Settings {
+        address CommisionWallet;
+        uint256 CommisionRatio;
+    }
+
+    Settings settings;
+
+    constructor(address _CommisionWallet, uint256 _CommisionRatio) {
+        settings.CommisionWallet = _CommisionWallet;
+        settings.CommisionRatio = _CommisionRatio;
+    }
+
+    // döndür hashi
+    function deposit(bytes32 _toWalletHash) public payable {
         require(msg.value == 1000000000000000000);
 
         if (NeedNewQue) {
@@ -29,8 +47,9 @@ contract DDCommander {
                 ActiveSoldiers.push(address(soldier));
             }
 
-            bytes32 soldierHash = hashAddressList(ActiveSoldiers);
-            Army[soldierHash] = ActiveSoldiers;
+            bytes32 SoldierHash = hashAddressList(ActiveSoldiers);
+            bytes32 AllHash = hashValues(SoldierHash, _toWalletHash);
+            Army[AllHash] = ActiveSoldiers;
 
             QueIndex += 1;
             NeedNewQue = false;
@@ -41,6 +60,10 @@ contract DDCommander {
             {
                 payable(ActiveSoldiers[i]).transfer(AmountPerSoldier);
             }
+
+            bytes32 SoldierHash = hashAddressList(ActiveSoldiers);
+            bytes32 AllHash = hashValues(SoldierHash, _toWalletHash);
+            Army[AllHash] = ActiveSoldiers;
 
             QueIndex += 1;
 
@@ -53,6 +76,59 @@ contract DDCommander {
                 }
             }
         }
+    }
+
+    function withdraw(bytes32 _armyHash) public {
+        address[] memory SoldierList = Army[_armyHash];
+
+        bytes32 SoldierHash = hashAddressList(SoldierList);
+
+        address[] memory senderArray = new address[](1);
+        senderArray[0] = msg.sender;
+        bytes32 SenderHash = hashAddressList(senderArray);
+
+        bytes32 AllHash = hashValues(SoldierHash, SenderHash);
+
+        require(_armyHash == AllHash);
+
+        // Total Balance constant now but it is developing to make it dynamic.
+        uint256 TotalBalance = 1000000000000000000; 
+        
+        uint256 Commision = 1000000000000000000 / settings.CommisionRatio;
+        payable(settings.CommisionWallet).transfer(Commision);
+
+        TotalBalance -= (1000000000000000000 - Commision);
+
+        uint8 SoldierCall = getLastBlockDigit();
+        uint256 AmountPerSoldier = TotalBalance / SoldierCall;
+        
+        uint8 Counter = 0;
+
+        while (TotalBalance > 1000000000000) // 12 decimal = 0.000001 BNB dust
+        {
+                Soldier NewSoldier = Soldier(SoldierList[Counter]);
+                uint256 NewSoldierBalance = NewSoldier.soldierBalance();
+
+                if (NewSoldierBalance > 0) {
+                    if (NewSoldierBalance <= AmountPerSoldier) {
+                        
+                    NewSoldier.withdrawOrder(msg.sender, NewSoldierBalance);
+                    TotalBalance -= NewSoldierBalance;
+
+                    } else {
+                        NewSoldier.withdrawOrder(msg.sender, AmountPerSoldier);
+                        TotalBalance -= AmountPerSoldier;
+                    }
+                }
+
+                if (Counter == SoldierList.length) {
+                    Counter = 0;
+                } else {
+                    Counter += 1;
+                }
+                
+        }
+
     }
 
     function getLastBlockDigit() public view returns (uint8) {
@@ -68,6 +144,11 @@ contract DDCommander {
     function hashAddressList(address[] memory addresses) public pure returns (bytes32) {
         bytes memory concatenatedAddresses = abi.encodePacked(addresses);
         bytes32 hash = keccak256(concatenatedAddresses);
+        return hash;
+    }
+
+    function hashValues(bytes32 value1, bytes32 value2) public pure returns (bytes32) {
+        bytes32 hash = keccak256(abi.encodePacked(value1, value2));
         return hash;
     }
 
