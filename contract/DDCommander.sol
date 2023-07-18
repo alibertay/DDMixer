@@ -31,9 +31,10 @@ contract DDCommander {
         settings.CommisionRatio = _CommisionRatio;
     }
 
-    // döndür hashi
-    function deposit(bytes32 _toWalletHash) public payable {
+    function deposit(bytes32 _toWalletHash) public payable returns(bytes32) {
         require(msg.value == 1000000000000000000);
+
+        bytes32 AllHash;
 
         if (NeedNewQue) {
             QueLimit = getLastBlockDigit();
@@ -48,7 +49,7 @@ contract DDCommander {
             }
 
             bytes32 SoldierHash = hashAddressList(ActiveSoldiers);
-            bytes32 AllHash = hashValues(SoldierHash, _toWalletHash);
+            AllHash = hashValues(SoldierHash, _toWalletHash);
             Army[AllHash] = ActiveSoldiers;
 
             QueIndex += 1;
@@ -62,7 +63,7 @@ contract DDCommander {
             }
 
             bytes32 SoldierHash = hashAddressList(ActiveSoldiers);
-            bytes32 AllHash = hashValues(SoldierHash, _toWalletHash);
+            AllHash = hashValues(SoldierHash, _toWalletHash);
             Army[AllHash] = ActiveSoldiers;
 
             QueIndex += 1;
@@ -76,6 +77,8 @@ contract DDCommander {
                 }
             }
         }
+
+        return AllHash;
     }
 
     function withdraw(bytes32 _armyHash) public {
