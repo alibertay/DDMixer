@@ -16,6 +16,7 @@ contract DDCommander {
     bool NeedNewQue = true;
 
     address[] ActiveSoldiers;
+    bytes32[] Garrisons;
 
     mapping(bytes32 => address[]) Army;
 
@@ -32,16 +33,16 @@ contract DDCommander {
     }
 
     function deposit(bytes32 _toWalletHash) public payable returns(bytes32) {
-        require(msg.value == 1000000000000000000);
+        require(msg.value == 10000000000000000);
 
         bytes32 AllHash;
 
         if (NeedNewQue) {
-            QueLimit = getLastBlockDigit();
+            QueLimit = getLastBlockDigit(true);
 
             uint256 AmountPerSoldier = msg.value / QueLimit; // Now constant but workin on make it dynamic
-            
-            for (uint8 i = 0; i < QueLimit; i++) 
+
+            for (uint8 i = 0; i < QueLimit; i++)
             {
                 DDSoldier soldier = new DDSoldier();
                 payable(address(soldier)).transfer(AmountPerSoldier);
@@ -56,8 +57,8 @@ contract DDCommander {
             NeedNewQue = false;
         } else {
             uint256 AmountPerSoldier = msg.value / QueLimit; // Now constant but workin on make it dynamic
-            
-            for (uint8 i = 0; i < QueLimit; i++) 
+
+            for (uint8 i = 0; i < QueLimit; i++)
             {
                 payable(ActiveSoldiers[i]).transfer(AmountPerSoldier);
             }
@@ -71,13 +72,14 @@ contract DDCommander {
             if (QueIndex == QueLimit) {
                 NeedNewQue = true;
 
-                for (uint8 i = 0; i < ActiveSoldiers.length; i++) 
+                for (uint8 i = 0; i < ActiveSoldiers.length; i++)
                 {
                     ActiveSoldiers.pop();
                 }
             }
         }
 
+        Garrisons.push(AllHash);
         return AllHash;
     }
 
@@ -92,56 +94,78 @@ contract DDCommander {
 
         bytes32 AllHash = hashValues(SoldierHash, SenderHash);
 
-        require(_armyHash == AllHash);
+        require(_armyHash == AllHash, "You are not the receiver.");
 
         // Total Balance constant now but it is developing to make it dynamic.
-        uint256 TotalBalance = 1000000000000000000; 
-        
+        uint256 TotalBalance = 1000000000000000000;
+
         uint256 Commision = 1000000000000000000 / settings.CommisionRatio;
         payable(settings.CommisionWallet).transfer(Commision);
 
         TotalBalance -= (1000000000000000000 - Commision);
 
-        uint8 SoldierCall = getLastBlockDigit();
-        uint256 AmountPerSoldier = TotalBalance / SoldierCall;
-        
-        uint8 Counter = 0;
+        uint256 GarrisonIndex = getLastBlockDigit(false);
 
-        while (TotalBalance > 1000000000000) // 12 decimal = 0.000001 BNB dust
+        bytes32 Garrison = Garrisons[GarrisonIndex];
+
+        SoldierList = Army[Garrison];
+
+        uint256 AmountPerSoldier = TotalBalance / SoldierList.length;
+
+        for (uint8 i = 0; i < SoldierList.length; i++)
         {
-                Soldier NewSoldier = Soldier(SoldierList[Counter]);
-                uint256 NewSoldierBalance = NewSoldier.soldierBalance();
-
-                if (NewSoldierBalance > 0) {
-                    if (NewSoldierBalance <= AmountPerSoldier) {
-                        
-                    NewSoldier.withdrawOrder(msg.sender, NewSoldierBalance);
-                    TotalBalance -= NewSoldierBalance;
-
-                    } else {
-                        NewSoldier.withdrawOrder(msg.sender, AmountPerSoldier);
-                        TotalBalance -= AmountPerSoldier;
-                    }
-                }
-
-                if (Counter == SoldierList.length) {
-                    Counter = 0;
-                } else {
-                    Counter += 1;
-                }
-                
+            payable(msg.sender).transfer(AmountPerSoldier);
         }
+
+        delete Garrisons[GarrisonIndex];
+        delete Army[Garrison];
 
     }
 
-    function getLastBlockDigit() public view returns (uint8) {
-        uint8 lastBlock = uint8(block.number % 10);
+    function getLastBlockDigit(bool isDeposit) public view returns (uint256) {
+        uint256 lastBlock;
 
-        if (lastBlock < 2) {
-            lastBlock = 3;
+        if (isDeposit) {
+            lastBlock = uint256(block.number % 10);
+
+            if (lastBlock < 2) {
+                lastBlock = 3;
+            }
+        } else {
+            uint256 factor = findTheFactor();
+
+            lastBlock = uint256(block.number % 10 * factor);
         }
 
         return lastBlock;
+
+    }
+
+    function findTheFactor() private view returns(uint256) {
+        uint256 factor;
+        uint256 GarrisonsLength = Garrisons.length;
+        if (GarrisonsLength < 10) {
+            factor = 1;
+        } else if (GarrisonsLength >= 10 && GarrisonsLength < 100) {
+            factor = 2;
+        } else if (GarrisonsLength >= 100 && GarrisonsLength < 1000) {
+            factor = 3;
+        } else {
+            factor = 4;
+        }
+
+        address[] memory CalledSoldiers = Army[Garrisons[factor]];
+
+        uint8 SoldiersCount = 0;
+
+        while (SoldiersCount == 0) {
+            if (CalledSoldiers.length == 0) {
+                factor += 1;
+                CalledSoldiers = Army[Garrisons[factor]];
+            }
+        }
+
+        return factor;
     }
 
     function hashAddressList(address[] memory addresses) public pure returns (bytes32) {

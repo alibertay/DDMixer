@@ -143,8 +143,13 @@ def hashWithKeccak(name):
     addressAsList = [str(name)]
     result = contract.functions.hashAddressList(addressAsList).call()
 
-    print("sıkıntı")
+    result = bytes32_to_string(result)
     return f"To Wallet Hash: {result}"
+
+def bytes32_to_string(bytes32_value):
+    hex_string = f"0x{str(bytes32_value.hex())}"
+
+    return hex_string
 
 if __name__ == '__main__':
     app.run(debug=True)
