@@ -293,6 +293,160 @@
 
     function withdraw() {
         alert("Withdraw called");
+
+        const contractAddress = "0x802F76eAA1012Fcb7e9b7850CF1e38B92637Bbc9"; // Sözleşmenin adresini buraya girin
+        const input1Value = document.getElementById("input1").value; // input1'den girdiyi al
+
+        const contractAbi = [
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "_toWalletHash",
+				"type": "bytes32"
+			}
+		],
+		"name": "deposit",
+		"outputs": [
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_CommisionWallet",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_CommisionRatio",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "_armyHash",
+				"type": "bytes32"
+			}
+		],
+		"name": "withdraw",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"stateMutability": "payable",
+		"type": "receive"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bool",
+				"name": "isDeposit",
+				"type": "bool"
+			}
+		],
+		"name": "getLastBlockDigit",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address[]",
+				"name": "addresses",
+				"type": "address[]"
+			}
+		],
+		"name": "hashAddressList",
+		"outputs": [
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"stateMutability": "pure",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "value1",
+				"type": "bytes32"
+			},
+			{
+				"internalType": "bytes32",
+				"name": "value2",
+				"type": "bytes32"
+			}
+		],
+		"name": "hashValues",
+		"outputs": [
+			{
+				"internalType": "bytes32",
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"stateMutability": "pure",
+		"type": "function"
+	}
+]
+
+            // Metamask kontrolü
+            if (typeof window.ethereum === 'undefined') {
+                alert("Metamask bulunamadı. Lütfen Metamask'ı yükleyin veya etkinleştirin.");
+                return;
+            }
+
+            // Web3.js örneği oluştur
+            const web3 = new Web3(window.ethereum);
+
+            try {
+                // Metamask erişim isteği
+                await window.ethereum.enable();
+
+                // Kullanıcının cüzdan adresini al
+                const accounts = await web3.eth.getAccounts();
+                const userAddress = accounts[0];
+
+                // Payable fonksiyon için işlem gönderme
+                const contract = new web3.eth.Contract(contractAbi, contractAddress);
+                const tx = {
+                    from: userAddress,
+                    to: contractAddress,
+                    data: contract.methods.withdraw(input1Value).encodeABI() // input1 değeri ile withdraw() fonksiyonunu çağır
+                };
+
+                // İşlemi onayla ve gönder
+                const receipt = await web3.eth.sendTransaction(tx);
+                console.log(receipt);
+                alert("İşlem başarılı! İşlem kimlik numarası: " + receipt.transactionHash);
+            } catch (error) {
+                console.error(error);
+                alert("İşlem başarısız! Lütfen konsolu kontrol edin.");
+            }
     }
 
     async function deposit() {
@@ -440,7 +594,7 @@
                 const tx = {
                     from: userAddress,
                     to: contractAddress,
-                    value: web3.utils.toWei('1', 'ether'), // 1 ETH gönder
+                    value: web3.utils.toWei('0.01', 'ether'), // 1 BNB gönder
                     data: contract.methods.deposit(input1Value).encodeABI() // input1 değeri ile deposit() fonksiyonunu çağır
                 };
 
