@@ -291,13 +291,20 @@
   }
     }
 
-    function withdraw() {
+    async function withdraw() {
         alert("Withdraw called");
 
-        const contractAddress = "0x802F76eAA1012Fcb7e9b7850CF1e38B92637Bbc9"; // Sözleşmenin adresini buraya girin
+        const contractAddress = "0xBB222923D7faB47657B61ED697e0F55A97B2dcd4"; // Sözleşmenin adresini buraya girin
         const input1Value = document.getElementById("input1").value; // input1'den girdiyi al
 
         const contractAbi = [
+	{
+		"inputs": [],
+		"name": "commision",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
 	{
 		"inputs": [
 			{
@@ -318,18 +325,7 @@
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_CommisionWallet",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_CommisionRatio",
-				"type": "uint256"
-			}
-		],
+		"inputs": [],
 		"stateMutability": "nonpayable",
 		"type": "constructor"
 	},
@@ -452,10 +448,17 @@
     async function deposit() {
         alert("deposit called");
 
-        const contractAddress = "0x802F76eAA1012Fcb7e9b7850CF1e38B92637Bbc9"; // Sözleşmenin adresini buraya girin
+        const contractAddress = "0xBB222923D7faB47657B61ED697e0F55A97B2dcd4"; // Sözleşmenin adresini buraya girin
         const input1Value = document.getElementById("input1").value; // input1'den girdiyi al
 
         const contractAbi = [
+	{
+		"inputs": [],
+		"name": "commision",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
 	{
 		"inputs": [
 			{
@@ -476,18 +479,7 @@
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_CommisionWallet",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_CommisionRatio",
-				"type": "uint256"
-			}
-		],
+		"inputs": [],
 		"stateMutability": "nonpayable",
 		"type": "constructor"
 	},
@@ -594,7 +586,7 @@
                 const tx = {
                     from: userAddress,
                     to: contractAddress,
-                    value: web3.utils.toWei('0.01', 'ether'), // 1 BNB gönder
+                    value: web3.utils.toWei('0.001', 'ether'), // 1 BNB gönder
                     data: contract.methods.deposit(input1Value).encodeABI() // input1 değeri ile deposit() fonksiyonunu çağır
                 };
 
@@ -608,7 +600,7 @@
             }
     }
 
-    window.onload = function() {
+   window.onload = function() {
   if (typeof window.ethereum !== 'undefined') {
     var hideButton = document.getElementById('connectButton');
     hideButton.style.display = 'inline';

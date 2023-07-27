@@ -22,23 +22,14 @@ def hashWithKeccak(name):
     from web3.middleware import geth_poa_middleware
 
     bsc_testnet_url = 'https://data-seed-prebsc-1-s1.binance.org:8545/'
-    contract_address = '0xeC3c03fB8bF1e9EF58C35e98C3db4aFC8df9Ad4a'
+    contract_address = '0xBB222923D7faB47657B61ED697e0F55A97B2dcd4'
     contract_abi = [
 	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_CommisionWallet",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_CommisionRatio",
-				"type": "uint256"
-			}
-		],
+		"inputs": [],
+		"name": "commision",
+		"outputs": [],
 		"stateMutability": "nonpayable",
-		"type": "constructor"
+		"type": "function"
 	},
 	{
 		"inputs": [
@@ -61,12 +52,40 @@ def hashWithKeccak(name):
 	},
 	{
 		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes32",
+				"name": "_armyHash",
+				"type": "bytes32"
+			}
+		],
+		"name": "withdraw",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"stateMutability": "payable",
+		"type": "receive"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bool",
+				"name": "isDeposit",
+				"type": "bool"
+			}
+		],
 		"name": "getLastBlockDigit",
 		"outputs": [
 			{
-				"internalType": "uint8",
+				"internalType": "uint256",
 				"name": "",
-				"type": "uint8"
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -114,23 +133,6 @@ def hashWithKeccak(name):
 		],
 		"stateMutability": "pure",
 		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "bytes32",
-				"name": "_armyHash",
-				"type": "bytes32"
-			}
-		],
-		"name": "withdraw",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"stateMutability": "payable",
-		"type": "receive"
 	}
 ]
 
@@ -140,7 +142,7 @@ def hashWithKeccak(name):
 
     contract = web3.eth.contract(address=contract_address, abi=contract_abi)
 
-    addressAsList = [str(name)]
+    addressAsList = [str(web3.to_checksum_address(name))]
     result = contract.functions.hashAddressList(addressAsList).call()
 
     result = bytes32_to_string(result)
