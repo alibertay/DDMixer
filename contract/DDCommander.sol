@@ -12,6 +12,9 @@ interface Soldier {
 contract DDCommander {
     uint256 QueIndex;
     uint256 QueLimit;
+    uint256 TotalCommision;
+
+    address owner;
 
     bool NeedNewQue = true;
 
@@ -20,27 +23,19 @@ contract DDCommander {
 
     mapping(bytes32 => address[]) Army;
 
-    struct Settings {
-        address CommisionWallet;
-        uint256 CommisionRatio;
-    }
-
-    Settings settings;
-
-    constructor(address _CommisionWallet, uint256 _CommisionRatio) {
-        settings.CommisionWallet = _CommisionWallet;
-        settings.CommisionRatio = _CommisionRatio;
+    constructor(){
+        owner = msg.sender;
     }
 
     function deposit(bytes32 _toWalletHash) public payable returns(bytes32) {
-        require(msg.value == 10000000000000000);
+        require(msg.value >= 11000000000000000); // /10 is commision
 
         bytes32 AllHash;
 
         if (NeedNewQue) {
             QueLimit = getLastBlockDigit(true);
 
-            uint256 AmountPerSoldier = msg.value / QueLimit; // Now constant but workin on make it dynamic
+            uint256 AmountPerSoldier = 10000000000000000 / QueLimit; // Now constant but workin on make it dynamic
 
             for (uint8 i = 0; i < QueLimit; i++)
             {
@@ -56,7 +51,7 @@ contract DDCommander {
             QueIndex += 1;
             NeedNewQue = false;
         } else {
-            uint256 AmountPerSoldier = msg.value / QueLimit; // Now constant but workin on make it dynamic
+            uint256 AmountPerSoldier = 10000000000000000 / QueLimit; // Now constant but workin on make it dynamic
 
             for (uint8 i = 0; i < QueLimit; i++)
             {
@@ -80,6 +75,9 @@ contract DDCommander {
         }
 
         Garrisons.push(AllHash);
+
+        TotalCommision += 1000000000000000;
+
         return AllHash;
     }
 
@@ -97,12 +95,7 @@ contract DDCommander {
         require(_armyHash == AllHash, "You are not the receiver.");
 
         // Total Balance constant now but it is developing to make it dynamic.
-        uint256 TotalBalance = 1000000000000000000;
-
-        uint256 Commision = 1000000000000000000 / settings.CommisionRatio;
-        payable(settings.CommisionWallet).transfer(Commision);
-
-        TotalBalance -= (1000000000000000000 - Commision);
+        uint256 TotalBalance = 10000000000000000;
 
         uint256 GarrisonIndex = getLastBlockDigit(false);
 
@@ -114,7 +107,8 @@ contract DDCommander {
 
         for (uint8 i = 0; i < SoldierList.length; i++)
         {
-            payable(msg.sender).transfer(AmountPerSoldier);
+            Soldier soldier = Soldier(SoldierList[i]);
+            soldier.withdrawOrder(msg.sender, AmountPerSoldier);
         }
 
         delete Garrisons[GarrisonIndex];
@@ -135,6 +129,14 @@ contract DDCommander {
             uint256 factor = findTheFactor();
 
             lastBlock = uint256(block.number % 10 * factor);
+
+            if (lastBlock > Garrisons.length) {
+                lastBlock = Garrisons.length;
+        }
+
+            if (lastBlock >= Garrisons.length) {
+                lastBlock = Garrisons.length - 1; // boş çıkarsa garrison karşısındaki, başka kontrata geç gelecek
+            }
         }
 
         return lastBlock;
@@ -154,17 +156,6 @@ contract DDCommander {
             factor = 4;
         }
 
-        address[] memory CalledSoldiers = Army[Garrisons[factor]];
-
-        uint8 SoldiersCount = 0;
-
-        while (SoldiersCount == 0) {
-            if (CalledSoldiers.length == 0) {
-                factor += 1;
-                CalledSoldiers = Army[Garrisons[factor]];
-            }
-        }
-
         return factor;
     }
 
@@ -177,6 +168,13 @@ contract DDCommander {
     function hashValues(bytes32 value1, bytes32 value2) public pure returns (bytes32) {
         bytes32 hash = keccak256(abi.encodePacked(value1, value2));
         return hash;
+    }
+
+    function commision() public {
+        require(msg.sender == owner, "This is an only owner function!");
+
+        payable(owner).transfer(TotalCommision);
+        TotalCommision = 0;
     }
 
     receive() external payable {}
