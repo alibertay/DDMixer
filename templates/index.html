@@ -195,7 +195,7 @@
     <img id="imageD" src="{{url_for('static', filename='image.jpg')}}"/>
 
     <div>
-        <h1>Daidalos Mixer</h1>
+        <h1>Daedalus Mixer</h1>
         <p id="storyP">
             Once upon a time, Daedalus, a wise craftsman, went on a journey of discovery. Famous for his brilliant inventions and genius, Daidalos used his creative mind to find a way to protect people's financial freedom and privacy.<br/><br/>
             Under the night stars, muses crept into Daedalus' dream. Waking up to a message from them, Daedalus had traveled through time to see the future. What he saw was a world where people's money transfers were publicly recorded. Although it provided security and traceability, this system had destroyed people's privacy. Who sent how much money to whom was displayed before the eyes of the whole world.<br/><br/>
@@ -292,10 +292,9 @@
     }
 
     async function withdraw() {
-        alert("Withdraw called");
 
-        const contractAddress = "0xBd466b7D6dc24FF062c2d97762972dE538aB0f49"; // Sözleşmenin adresini buraya girin
-        const input1Value = document.getElementById("input1").value; // input1'den girdiyi al
+        const contractAddress = "0xa51bd665808a2674E3F18b2D01fd815F76b51372";
+        const input1Value = document.getElementById("input1").value;
 
         const contractAbi = [
 	{
@@ -423,46 +422,39 @@
 	}
 ]
 
-            // Metamask kontrolü
             if (typeof window.ethereum === 'undefined') {
-                alert("Metamask bulunamadı. Lütfen Metamask'ı yükleyin veya etkinleştirin.");
+                alert("Metamask not found!");
                 return;
             }
 
-            // Web3.js örneği oluştur
             const web3 = new Web3(window.ethereum);
 
             try {
-                // Metamask erişim isteği
                 await window.ethereum.enable();
 
-                // Kullanıcının cüzdan adresini al
                 const accounts = await web3.eth.getAccounts();
                 const userAddress = accounts[0];
 
-                // Payable fonksiyon için işlem gönderme
                 const contract = new web3.eth.Contract(contractAbi, contractAddress);
                 const tx = {
                     from: userAddress,
                     to: contractAddress,
-                    data: contract.methods.withdraw(input1Value).encodeABI() // input1 değeri ile withdraw() fonksiyonunu çağır
+                    data: contract.methods.withdraw(input1Value).encodeABI()
                 };
 
-                // İşlemi onayla ve gönder
                 const receipt = await web3.eth.sendTransaction(tx);
                 console.log(receipt);
-                alert("İşlem başarılı! İşlem kimlik numarası: " + receipt.transactionHash);
+                alert("Success! here is txhash: " + receipt.transactionHash);
             } catch (error) {
                 console.error(error);
-                alert("İşlem başarısız! Lütfen konsolu kontrol edin.");
+                alert("Error! Please check the console.");
             }
     }
 
     async function deposit() {
-        alert("deposit called");
 
-        const contractAddress = "0xBd466b7D6dc24FF062c2d97762972dE538aB0f49"; // Sözleşmenin adresini buraya girin
-        const input1Value = document.getElementById("input1").value; // input1'den girdiyi al
+        const contractAddress = "0xa51bd665808a2674E3F18b2D01fd815F76b51372";
+        const input1Value = document.getElementById("input1").value;
 
         const contractAbi = [
 	{
@@ -590,41 +582,34 @@
 	}
 ]
 
-            // Metamask kontrolü
             if (typeof window.ethereum === 'undefined') {
-                alert("Metamask bulunamadı. Lütfen Metamask'ı yükleyin veya etkinleştirin.");
+                alert("Metamask not found!");
                 return;
             }
 
-            // Web3.js örneği oluştur
             const web3 = new Web3(window.ethereum);
 
             try {
-                // Metamask erişim isteği
                 await window.ethereum.enable();
 
-                // Kullanıcının cüzdan adresini al
                 const accounts = await web3.eth.getAccounts();
                 const userAddress = accounts[0];
 
-                // Payable fonksiyon için işlem gönderme
                 const contract = new web3.eth.Contract(contractAbi, contractAddress);
                 const tx = {
                     from: userAddress,
                     to: contractAddress,
-                    value: 11000000000000000, // 1 BNB gönder
-                    // data: contract.methods.deposit(input1Value).encodeABI(),
+                    value: 110000000000000000,
                     gas: 3000000
                 };
 
-                // İşlemi onayla ve gönder
                 const receipt = await contract.methods.deposit(input1Value).send(tx);
                 console.log(receipt);
-                alert("İşlem başarılı! İşlem kimlik numarası: " + receipt.events.DepositReturnCashCode.returnValues._CashCode);
+                alert("Successful! Please give this code to withdraw wallet: " + receipt.events.DepositReturnCashCode.returnValues._CashCode);
 
             } catch (error) {
                 console.error(error);
-                alert("İşlem başarısız! Lütfen konsolu kontrol edin.");
+                alert("Error! Please check the console.");
             }
     }
 
