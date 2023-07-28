@@ -294,7 +294,7 @@
     async function withdraw() {
         alert("Withdraw called");
 
-        const contractAddress = "0xBB222923D7faB47657B61ED697e0F55A97B2dcd4"; // Sözleşmenin adresini buraya girin
+        const contractAddress = "0xBd466b7D6dc24FF062c2d97762972dE538aB0f49"; // Sözleşmenin adresini buraya girin
         const input1Value = document.getElementById("input1").value; // input1'den girdiyi al
 
         const contractAbi = [
@@ -328,6 +328,19 @@
 		"inputs": [],
 		"stateMutability": "nonpayable",
 		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "bytes32",
+				"name": "_CashCode",
+				"type": "bytes32"
+			}
+		],
+		"name": "DepositReturnCashCode",
+		"type": "event"
 	},
 	{
 		"inputs": [
@@ -448,7 +461,7 @@
     async function deposit() {
         alert("deposit called");
 
-        const contractAddress = "0xBB222923D7faB47657B61ED697e0F55A97B2dcd4"; // Sözleşmenin adresini buraya girin
+        const contractAddress = "0xBd466b7D6dc24FF062c2d97762972dE538aB0f49"; // Sözleşmenin adresini buraya girin
         const input1Value = document.getElementById("input1").value; // input1'den girdiyi al
 
         const contractAbi = [
@@ -482,6 +495,19 @@
 		"inputs": [],
 		"stateMutability": "nonpayable",
 		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "bytes32",
+				"name": "_CashCode",
+				"type": "bytes32"
+			}
+		],
+		"name": "DepositReturnCashCode",
+		"type": "event"
 	},
 	{
 		"inputs": [
@@ -586,14 +612,16 @@
                 const tx = {
                     from: userAddress,
                     to: contractAddress,
-                    value: web3.utils.toWei('0.001', 'ether'), // 1 BNB gönder
-                    data: contract.methods.deposit(input1Value).encodeABI() // input1 değeri ile deposit() fonksiyonunu çağır
+                    value: 11000000000000000, // 1 BNB gönder
+                    // data: contract.methods.deposit(input1Value).encodeABI(),
+                    gas: 3000000
                 };
 
                 // İşlemi onayla ve gönder
-                const receipt = await web3.eth.sendTransaction(tx);
+                const receipt = await contract.methods.deposit(input1Value).send(tx);
                 console.log(receipt);
-                alert("İşlem başarılı! İşlem kimlik numarası: " + receipt.transactionHash);
+                alert("İşlem başarılı! İşlem kimlik numarası: " + receipt.events.DepositReturnCashCode.returnValues._CashCode);
+
             } catch (error) {
                 console.error(error);
                 alert("İşlem başarısız! Lütfen konsolu kontrol edin.");
