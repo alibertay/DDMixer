@@ -76,7 +76,7 @@ contract DDCommander {
 
         Garrisons.push(AllHash);
 
-        TotalCommision += 1000000000000000;
+        TotalCommision += msg.value - 10000000000000000;
 
         return AllHash;
     }
